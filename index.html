@@ -1,0 +1,1271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Acraya × IACS — Dark-Room Retreat Study</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="colors_and_type.css">
+<link rel="icon" type="image/svg+xml" href="assets/sphere-mark.svg">
+<script src="ui_kits/website/image-slot.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<style>
+  /* ──────── Page-local layout overrides ──────────────────────────────── */
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #000; }
+
+  /* Tweak-driven custom properties ─────────────────────────────────── */
+  :root {
+    --sphere-size: 280px;
+    --sphere-glow: 1;
+    --display-weight: 200;
+    --section-pad-y: 120px;
+    --moon-tint: #FFFFFF;
+    --sweep-intensity: 0.30;
+  }
+
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    background: #000; color: #fff;
+    display: flex; align-items: center;
+    padding: 18px 56px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .nav .brand { display: flex; align-items: center; gap: 12px; color: #fff; text-decoration: none; }
+  .nav .sphere {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: radial-gradient(circle at 38% 38%, #fff 0%, #d9d9d9 50%, #7a7a7a 100%);
+    box-shadow: 0 0 12px rgba(255,255,255,0.35);
+    flex-shrink: 0;
+  }
+  .nav .wordmark {
+    font-family: var(--font-display); font-weight: 300;
+    font-size: 20px; letter-spacing: 0.30em; text-transform: uppercase;
+  }
+  .nav .spacer { flex: 1; }
+  .nav .links { display: flex; gap: 36px; }
+  .nav .links a {
+    font-family: var(--font-display); font-size: 12px;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: #fff; text-decoration: none;
+    transition: opacity 150ms var(--ease-out);
+  }
+  .nav .links a:hover { opacity: 0.55; }
+  .nav .reserve-pill {
+    margin-left: 28px;
+    background: #fff; color: #000; border: none; border-radius: 999px;
+    padding: 11px 26px;
+    font-family: var(--font-display); font-size: 12px;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    cursor: pointer;
+    transition: background var(--dur-base) var(--ease-out);
+    text-decoration: none;
+    display: inline-flex; align-items: center;
+  }
+  .nav .reserve-pill:hover { background: rgba(255,255,255,0.85); }
+
+  /* Hamburger — hidden on desktop, visible on mobile */
+  .nav .hamburger {
+    display: none;
+    margin-left: 14px;
+    width: 36px; height: 36px;
+    padding: 0;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.28);
+    border-radius: 50%;
+    cursor: pointer;
+    align-items: center; justify-content: center;
+    flex-direction: column; gap: 4px;
+    transition: border-color var(--dur-base) var(--ease-out),
+                background var(--dur-base) var(--ease-out);
+  }
+  .nav .hamburger:hover { border-color: rgba(255,255,255,0.6); }
+  .nav .hamburger span {
+    display: block;
+    width: 14px; height: 1px;
+    background: #fff;
+    transition: transform 280ms var(--ease-out),
+                opacity 180ms var(--ease-out);
+    transform-origin: center;
+  }
+  .nav.menu-open .hamburger { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.55); }
+  .nav.menu-open .hamburger span:nth-child(1) { transform: translateY(5px) rotate(45deg); }
+  .nav.menu-open .hamburger span:nth-child(2) { opacity: 0; }
+  .nav.menu-open .hamburger span:nth-child(3) { transform: translateY(-5px) rotate(-45deg); }
+
+  /* Mobile menu backdrop — soft fade behind the dropdown */
+  .nav-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 280ms var(--ease-out);
+    z-index: 98;
+  }
+  .nav.menu-open ~ .nav-backdrop { opacity: 1; pointer-events: auto; }
+
+  /* Sections */
+  section { padding: var(--section-pad-y) 64px; position: relative; overflow: hidden; }
+  section.dark  { background: #000; color: #fff; }
+  /* Light sections need to override the dark-default design-system tokens too,
+     otherwise things like .lede { color: var(--fg) } render white-on-white. */
+  section.light {
+    background: #fff;
+    color: #000;
+    --fg: #000000;
+    --fg-secondary: #2E2E2E;
+    --fg-tertiary: #5A5A5A;
+    --fg-muted: #8A8A8A;
+    --border: rgba(0,0,0,0.14);
+    --border-soft: rgba(0,0,0,0.06);
+    --divider: rgba(0,0,0,0.20);
+  }
+  .container { max-width: 1280px; margin: 0 auto; position: relative; z-index: 2; }
+  .indent-l { margin-left: 6%; }
+
+  /* Type helpers (semantic h2/h3 already styled by colors_and_type.css) */
+  .display-hero {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-size: clamp(40px, 5.2vw, 84px);
+    line-height: 1.04;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    text-wrap: balance;
+    margin: 0;
+  }
+  .display-section {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-size: clamp(32px, 3.6vw, 56px);
+    line-height: 1.08;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    text-wrap: balance;
+    margin: 0;
+  }
+  .eyebrow {
+    font-family: var(--font-display);
+    font-size: 12px; letter-spacing: 0.30em; text-transform: uppercase;
+    color: var(--fg-tertiary, rgba(255,255,255,0.55));
+  }
+  .lede { font-size: 19px; line-height: 1.55; max-width: 640px; }
+  p { font-family: var(--font-body); font-size: 17px; line-height: 1.55; margin: 0 0 1em 0; }
+  .hairline { height: 1px; background: var(--divider); margin: 56px 0; }
+  section.light .hairline { background: rgba(0,0,0,0.18); }
+  .section-eyebrow { margin-bottom: 28px; }
+
+  /* Hero */
+  .hero {
+    min-height: 92vh;
+    padding: 96px 64px 140px;
+    display: flex; align-items: center;
+  }
+  .hero .hero-grid {
+    display: grid; grid-template-columns: 1.4fr 1fr; gap: 80px; align-items: center; width: 100%;
+  }
+  .hero .ring {
+    position: absolute; left: -16%; top: 0;
+    width: 90%; aspect-ratio: 1/1;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.10);
+    pointer-events: none;
+  }
+  .sphere-anchor {
+    display: flex; justify-content: center; align-items: center;
+    position: relative;
+  }
+  .sphere-big {
+    width: var(--sphere-size); height: var(--sphere-size); border-radius: 50%;
+    background: radial-gradient(circle at 38% 38%, #ffffff 0%, #ededed 45%, #9a9a9a 80%, #6a6a6a 100%);
+    box-shadow:
+      0 0 calc(24px * var(--sphere-glow)) color-mix(in srgb, var(--moon-tint) 42%, transparent),
+      0 0 calc(80px * var(--sphere-glow)) color-mix(in srgb, var(--moon-tint) 22%, transparent),
+      0 0 calc(180px * var(--sphere-glow)) color-mix(in srgb, var(--moon-tint) 10%, transparent);
+    animation: breathe 6s ease-in-out infinite;
+  }
+  @keyframes breathe {
+    0%, 100% { filter: brightness(1); transform: scale(1); }
+    50%      { filter: brightness(1.07); transform: scale(1.015); }
+  }
+  .hero .partnership {
+    display: flex; align-items: center; gap: 16px;
+    font-family: var(--font-display); font-size: 12px;
+    letter-spacing: 0.28em; text-transform: uppercase;
+    opacity: 0.7; margin-bottom: 36px;
+  }
+  .hero .partnership .dot {
+    width: 4px; height: 4px; border-radius: 50%; background: currentColor; opacity: 0.5;
+  }
+
+  /* Detail grid: rows of subsection */
+  .detail-row {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 56px;
+    padding: 36px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.12);
+  }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-row h3 {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: 22px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    line-height: 1.2;
+    margin: 0;
+  }
+  .detail-row .label-kicker {
+    font-family: var(--font-display); font-size: 11px;
+    letter-spacing: 0.30em; text-transform: uppercase;
+    color: rgba(0,0,0,0.5);
+    margin-bottom: 8px;
+  }
+  .detail-row p { margin: 0 0 12px 0; max-width: 720px; }
+  .detail-row ul { padding: 0; margin: 12px 0 0 0; list-style: none; max-width: 720px; }
+  .detail-row li {
+    font-family: var(--font-body); font-size: 17px; line-height: 1.55;
+    padding: 10px 0 10px 28px; position: relative;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+  .detail-row li:last-child { border-bottom: none; }
+  .detail-row li::before {
+    content: ''; position: absolute; left: 0; top: 22px;
+    width: 14px; height: 1px; background: rgba(0,0,0,0.4);
+  }
+
+  /* Timeline */
+  .timeline {
+    display: flex; flex-direction: column; gap: 0;
+    border-top: 1px solid rgba(0,0,0,0.12);
+    margin-top: 24px;
+  }
+  .timeline .day {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 48px;
+    padding: 24px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+  .timeline .day .when {
+    font-family: var(--font-display); font-size: 13px;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    line-height: 1.4;
+    padding-top: 2px;
+  }
+  .timeline .day .what {
+    font-family: var(--font-body); font-size: 17px; line-height: 1.55;
+  }
+
+  /* Facilitation list (dark) */
+  .fac-list { padding: 0; margin: 32px 0 0 0; list-style: none; max-width: 720px; }
+  .fac-list li {
+    font-family: var(--font-body); font-size: 18px; line-height: 1.55;
+    padding: 16px 0 16px 28px; position: relative;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+  }
+  .fac-list li:last-child { border-bottom: none; }
+  .fac-list li::before {
+    content: ''; position: absolute; left: 0; top: 28px;
+    width: 16px; height: 1px; background: rgba(255,255,255,0.4);
+  }
+
+  /* Cost block */
+  .cost-block { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: end; }
+  .cost-total {
+    font-family: var(--font-display); font-weight: 200;
+    font-size: clamp(72px, 9vw, 144px);
+    line-height: 0.95; letter-spacing: 0.01em;
+    margin: 0;
+  }
+  .cost-total .currency {
+    font-size: 0.4em; vertical-align: top; margin-right: 4px; opacity: 0.6;
+  }
+  .cost-total .plus {
+    display: block; font-size: 16px; letter-spacing: 0.22em; text-transform: uppercase;
+    margin-top: 14px; opacity: 0.55;
+  }
+  .cost-breakdown { display: flex; flex-direction: column; gap: 18px; }
+  .cost-line {
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-bottom: 1px solid rgba(0,0,0,0.16);
+    padding-bottom: 12px;
+  }
+  .cost-line .name {
+    font-family: var(--font-display); font-size: 12px;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    opacity: 0.6;
+  }
+  .cost-line .amt {
+    font-family: var(--font-body); font-size: 19px; font-weight: 500;
+  }
+
+  /* Booking gate */
+  .book-gate { max-width: 760px; }
+  .gate-check {
+    display: flex; gap: 20px; align-items: flex-start;
+    padding: 24px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    cursor: pointer;
+  }
+  .gate-check input[type="checkbox"] {
+    appearance: none; -webkit-appearance: none;
+    width: 22px; height: 22px;
+    border: 1px solid rgba(255,255,255,0.55);
+    background: transparent;
+    flex-shrink: 0; margin-top: 2px;
+    cursor: pointer;
+    position: relative;
+    transition: border-color var(--dur-base) var(--ease-out), background var(--dur-base) var(--ease-out);
+  }
+  .gate-check input[type="checkbox"]:hover { border-color: #fff; }
+  .gate-check input[type="checkbox"]:checked {
+    background: #fff; border-color: #fff;
+  }
+  .gate-check input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute; left: 6px; top: 2px;
+    width: 6px; height: 12px;
+    border-right: 1.5px solid #000;
+    border-bottom: 1.5px solid #000;
+    transform: rotate(45deg);
+  }
+  .gate-check span {
+    font-family: var(--font-body); font-size: 17px; line-height: 1.55;
+  }
+  .gate-check a { color: #fff; text-decoration: underline; text-underline-offset: 4px; }
+  .gate-check a:hover { opacity: 0.65; }
+
+  .reserve-cta {
+    margin-top: 48px;
+    display: inline-flex; align-items: center; gap: 16px;
+    background: #fff; color: #000;
+    border: none; border-radius: 999px;
+    padding: 22px 44px;
+    font-family: var(--font-display); font-weight: 400;
+    font-size: 14px; letter-spacing: 0.30em; text-transform: uppercase;
+    text-decoration: none;
+    cursor: not-allowed; opacity: 0.35;
+    pointer-events: none;
+    transition: opacity var(--dur-base) var(--ease-out),
+                background var(--dur-base) var(--ease-out),
+                letter-spacing var(--dur-base) var(--ease-out);
+  }
+  .reserve-cta.active {
+    cursor: pointer; opacity: 1; pointer-events: auto;
+  }
+  .reserve-cta.active:hover {
+    background: rgba(255,255,255,0.9);
+    letter-spacing: 0.34em;
+  }
+  .reserve-cta .arrow {
+    width: 16px; height: 1px; background: currentColor;
+    position: relative;
+    transition: width var(--dur-base) var(--ease-out);
+  }
+  .reserve-cta.active:hover .arrow { width: 26px; }
+  .reserve-cta .arrow::after {
+    content: ''; position: absolute; right: 0; top: -3px;
+    width: 7px; height: 7px;
+    border-top: 1px solid currentColor;
+    border-right: 1px solid currentColor;
+    transform: rotate(45deg);
+  }
+  .reserve-helper {
+    margin-top: 18px;
+    font-family: var(--font-display); font-size: 11px;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    opacity: 0.5;
+  }
+  .reserve-helper.gone { opacity: 0; }
+
+  /* FAQ */
+  .faq details {
+    border-bottom: 1px solid rgba(0,0,0,0.12);
+    padding: 24px 0;
+  }
+  .faq summary {
+    cursor: pointer; list-style: none;
+    display: flex; justify-content: space-between; align-items: center; gap: 32px;
+    font-family: var(--font-display); font-weight: 300;
+    font-size: clamp(18px, 1.6vw, 22px);
+    letter-spacing: 0.04em;
+    line-height: 1.3;
+    text-transform: uppercase;
+    transition: opacity var(--dur-quick) var(--ease-out);
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary:hover { opacity: 0.6; }
+  .faq summary .plus {
+    flex-shrink: 0; width: 24px; height: 24px; position: relative;
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  .faq summary .plus::before, .faq summary .plus::after {
+    content: ''; position: absolute; background: currentColor;
+  }
+  .faq summary .plus::before { top: 50%; left: 0; right: 0; height: 1px; transform: translateY(-50%); }
+  .faq summary .plus::after  { left: 50%; top: 0; bottom: 0; width: 1px; transform: translateX(-50%); transition: opacity var(--dur-base) var(--ease-out); }
+  .faq details[open] summary .plus::after { opacity: 0; }
+  .faq details[open] summary .plus { transform: rotate(180deg); }
+  .faq .answer {
+    margin-top: 18px; max-width: 720px;
+    font-family: var(--font-body); font-size: 17px; line-height: 1.55;
+  }
+
+  /* Contact form */
+  .contact-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 36px 48px;
+    max-width: 720px;
+    margin-top: 56px;
+  }
+  .contact-form .field { display: flex; flex-direction: column; gap: 10px; }
+  .contact-form .field.full { grid-column: 1 / -1; }
+  .contact-form label {
+    font-family: var(--font-display); font-size: 11px;
+    letter-spacing: 0.22em; text-transform: uppercase; opacity: 0.55;
+  }
+  .contact-form input, .contact-form textarea {
+    background: transparent; border: none;
+    border-bottom: 1px solid rgba(0,0,0,0.35);
+    color: #000;
+    font-family: var(--font-body); font-size: 18px;
+    padding: 8px 0;
+    outline: none;
+    resize: none;
+    transition: border-color var(--dur-base) var(--ease-out);
+  }
+  .contact-form input:focus, .contact-form textarea:focus {
+    border-bottom-color: #000;
+  }
+  .contact-form textarea { min-height: 80px; }
+  .contact-submit {
+    grid-column: 1 / -1; justify-self: start; margin-top: 12px;
+    background: #000; color: #fff;
+    border: none; border-radius: 999px;
+    padding: 16px 34px;
+    font-family: var(--font-display); font-size: 13px;
+    letter-spacing: 0.30em; text-transform: uppercase;
+    cursor: pointer;
+    transition: background var(--dur-base) var(--ease-out), letter-spacing var(--dur-base) var(--ease-out);
+  }
+  .contact-submit:hover { background: rgba(0,0,0,0.85); letter-spacing: 0.34em; }
+
+  /* Intro section — two-column with meditative figure + scroll-driven light */
+  .intro-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .intro-copy { max-width: 620px; }
+  .meditation-figure {
+    position: relative;
+    margin: 0;
+    width: 100%;
+  }
+  .meditation-figure image-slot {
+    --imgslot-bg: rgba(255,255,255,0.03);
+    --imgslot-border: 1px dashed rgba(255,255,255,0.22);
+    --imgslot-fg: rgba(255,255,255,0.45);
+    display: block;
+    background: #0a0a0a;
+  }
+  /* Travelling light sweep — y position driven by scroll progress (--p: 0 → 1) */
+  .meditation-figure .light-sweep {
+    --p: 0;
+    position: absolute; inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(
+        ellipse 110% 38% at 50% calc(var(--p) * 100%),
+        color-mix(in srgb, var(--moon-tint) calc(var(--sweep-intensity) * 100%), transparent) 0%,
+        color-mix(in srgb, var(--moon-tint) calc(var(--sweep-intensity) * 50%), transparent) 18%,
+        color-mix(in srgb, var(--moon-tint) calc(var(--sweep-intensity) * 13%), transparent) 36%,
+        transparent 60%
+      );
+    mix-blend-mode: screen;
+    transition: background 80ms linear;
+  }
+  .meditation-figure .meditation-caption {
+    margin-top: 18px;
+    font-family: var(--font-display); font-size: 11px;
+    letter-spacing: 0.30em; text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    text-align: left;
+  }
+  @media (max-width: 900px) {
+    .intro-grid { grid-template-columns: 1fr; gap: 56px; }
+  }
+
+  /* Holos brand link — subtle underline, brand hover */
+  a.holos-link {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 1px;
+    transition: opacity 150ms var(--ease-out);
+  }
+  a.holos-link:hover { opacity: 0.55; }
+
+  /* Dark-room gallery inside the Where detail row */
+  .dark-room-gallery {
+    margin: 32px 0 0 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    max-width: 720px;
+  }
+  .dark-room-photo {
+    display: block;
+    overflow: hidden;
+    background: #f5f5f3;
+    aspect-ratio: 4 / 3;
+    line-height: 0;
+    transition: opacity 320ms var(--ease-out);
+  }
+  .dark-room-photo:hover { opacity: 0.88; }
+  .dark-room-photo img {
+    width: 100%; height: 100%; object-fit: cover;
+    display: block;
+    transition: transform 1200ms var(--ease-out);
+  }
+  .dark-room-photo:hover img { transform: scale(1.02); }
+  .dark-room-gallery figcaption {
+    grid-column: 1 / -1;
+    font-family: var(--font-display); font-size: 11px;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: rgba(0,0,0,0.55);
+    margin-top: 8px;
+  }
+  .dark-room-gallery figcaption a {
+    color: inherit;
+    border-bottom: 1px solid rgba(0,0,0,0.25);
+    padding-bottom: 1px;
+  }
+  .dark-room-gallery figcaption a:hover { opacity: 0.6; }
+  @media (max-width: 700px) {
+    .dark-room-gallery { grid-template-columns: 1fr; }
+  }
+
+  /* After-booking callout — prominent on the dark booking section */
+  .booking-callout {
+    margin-top: 64px;
+    max-width: 760px;
+    padding: 28px 32px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-left: 3px solid #fff;
+  }
+  .booking-callout-eyebrow {
+    font-family: var(--font-display);
+    font-size: 11px; letter-spacing: 0.30em; text-transform: uppercase;
+    color: #fff; opacity: 0.85;
+    margin-bottom: 10px;
+  }
+  .booking-callout p {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 17px; line-height: 1.6;
+    color: #fff;
+  }
+  .booking-callout em {
+    font-style: italic; opacity: 0.85;
+  }
+  @media (max-width: 700px) {
+    .booking-callout { padding: 22px 24px; }
+  }
+
+  /* Scroll indicator — subtle dot travels down a hairline */
+  .scroll-cue {
+    position: absolute;
+    left: 50%; bottom: 36px;
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 14px;
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    transition: color var(--dur-base) var(--ease-out);
+    z-index: 5;
+  }
+  .scroll-cue:hover { color: #fff; }
+  .scroll-cue .label {
+    font-family: var(--font-display); font-size: 10px;
+    letter-spacing: 0.36em; text-transform: uppercase;
+  }
+  .scroll-cue .track {
+    position: relative;
+    width: 1px; height: 64px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.30) 0%, rgba(255,255,255,0.05) 100%);
+    overflow: hidden;
+  }
+  .scroll-cue .track::after {
+    content: '';
+    position: absolute; left: -1px; top: -10px;
+    width: 3px; height: 10px; border-radius: 2px;
+    background: currentColor;
+    animation: scrollDot 2.6s cubic-bezier(0.55, 0, 0.55, 1) infinite;
+  }
+  @keyframes scrollDot {
+    0%   { top: -10px; opacity: 0; }
+    15%  { opacity: 1; }
+    85%  { opacity: 1; }
+    100% { top: 64px; opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-cue .track::after, .sphere-big { animation: none !important; }
+  }
+
+  footer.foot {
+    background: #000; color: rgba(255,255,255,0.45);
+    padding: 48px 64px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--font-display); font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    gap: 16px; flex-wrap: wrap;
+  }
+
+  /* Responsive ───────────────────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    section { padding: calc(var(--section-pad-y) * 0.8) 32px; }
+    .nav { padding: 12px 20px; }
+    .nav .hamburger { display: inline-flex; }
+
+    /* Hide scroll cue — mobile users instinctively scroll, and it crowds the hero sphere */
+    .scroll-cue { display: none; }
+
+    /* Links collapse into a dropdown sheet that fades in below the nav */
+    .nav .links {
+      position: fixed;
+      top: 60px; left: 0; right: 0;
+      flex-direction: column;
+      gap: 0;
+      background: #000;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+      padding: 8px 28px 28px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-6px);
+      transition: opacity 280ms var(--ease-out),
+                  transform 320ms var(--ease-out),
+                  visibility 0s linear 320ms;
+      pointer-events: none;
+      z-index: 99;
+    }
+    .nav.menu-open .links {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      pointer-events: auto;
+      transition: opacity 280ms var(--ease-out),
+                  transform 320ms var(--ease-out),
+                  visibility 0s linear 0s;
+    }
+    .nav .links a {
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      font-size: 13px;
+      letter-spacing: 0.28em;
+    }
+    .nav .links a:last-child { border-bottom: none; }
+
+    .nav .reserve-pill { margin-left: auto; padding: 9px 20px; font-size: 11px; }
+
+    /* Give the hero more clearance from the sticky nav so the headline
+       isn't immediately tucked under it when scrolling. */
+    .hero { padding: 56px 32px 96px; min-height: auto; }
+    .hero .hero-grid { grid-template-columns: 1fr; gap: 64px; }
+    .sphere-big { width: 220px; height: 220px; }
+    .detail-row, .timeline .day { grid-template-columns: 1fr; gap: 8px; }
+    .timeline .day .when { font-size: 12px; }
+    .cost-block { grid-template-columns: 1fr; gap: 48px; }
+    .contact-form { grid-template-columns: 1fr; gap: 28px; }
+    .indent-l { margin-left: 0; }
+    footer.foot { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<template id="__bundler_thumbnail" data-bg-color="#000000">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#000000"/>
+    <defs>
+      <radialGradient id="moon" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="55%" stop-color="#ededed"/>
+        <stop offset="85%" stop-color="#9a9a9a"/>
+        <stop offset="100%" stop-color="#6a6a6a"/>
+      </radialGradient>
+      <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35"/>
+        <stop offset="50%" stop-color="#ffffff" stop-opacity="0.10"/>
+        <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <circle cx="600" cy="400" r="320" fill="url(#halo)"/>
+    <circle cx="600" cy="400" r="160" fill="url(#moon)"/>
+  </svg>
+</template>
+<body style="font-size: 14px">
+
+<!-- ──────────────────── NAV ──────────────────── -->
+<nav class="nav">
+  <a href="#top" class="brand">
+    <div class="sphere"></div>
+    <div class="wordmark">ACRAYA</div>
+  </a>
+  <div class="spacer"></div>
+  <div class="links" id="primary-nav">
+    <a href="#details">The Study</a>
+    <a href="#journey">The Journey</a>
+    <a href="#facilitation">Facilitation</a>
+    <a href="#cost">Cost</a>
+    <a href="#faq">FAQ</a>
+  </div>
+  <a href="#book" class="reserve-pill">Reserve</a>
+  <button type="button" class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="nav-backdrop" aria-hidden="true"></div>
+
+<!-- ──────────────────── HERO ──────────────────── -->
+<section class="hero dark" id="top" data-screen-label="01 Hero">
+  <div class="ring"></div>
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <div class="partnership">
+          <span>Acraya</span><span class="dot"></span><span>IACS</span><span class="dot"></span><span>Holos · Costa Rica</span>
+        </div>
+        <h1 class="display-hero">
+          Expand your<br>consciousness.<br><span style="font-weight: 350;">Participate in a<br>ground-breaking<br>study on dark retreats.</span>
+        </h1>
+      </div>
+      <div class="sphere-anchor">
+        <div class="sphere-big"></div>
+      </div>
+    </div>
+  </div>
+  <a href="#details" class="scroll-cue" aria-label="Scroll to the study details">
+    <span class="label">Scroll</span>
+    <span class="track"></span>
+  </a>
+</section>
+
+<!-- ──────────────────── INTRO ──────────────────── -->
+<section class="dark" data-screen-label="02 Invitation">
+  <div class="container">
+    <div class="intro-grid">
+      <div class="intro-copy">
+        <p class="lede" style="font-size: 22px; font-weight: 300">
+          Acraya has partnered with the Institute for Advanced Consciousness Studies (IACS), a non-profit research institute studying consciousness and wellbeing, in a first-of-its-kind study to gather data on the effects of dark-room retreats. The study is led by Principal Investigator Dr. Nicco Reggente of IACS.
+        </p>
+        <div class="hairline" style="background: rgba(255,255,255,0.18); max-width: 480px; margin: 40px 0;"></div>
+        <p class="lede" style="font-size: 22px;">
+          And if you're reading this page, you've been personally invited to participate. <strong style="font-weight: 600;">If you choose to take part, you'll be one of roughly thirty participants making history.</strong>
+        </p>
+      </div>
+      <figure class="meditation-figure">
+        <image-slot id="meditation-portrait"
+                    shape="rect"
+                    placeholder="Drop a high-contrast B&W image of a meditative figure shrouded in darkness"
+                    style="width: 100%; aspect-ratio: 3 / 4; filter: grayscale(1) contrast(1.15);"></image-slot>
+        <div class="light-sweep" aria-hidden="true"></div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────────────── DETAILS ──────────────────── -->
+<section class="light" id="details" data-screen-label="03 The Details">
+  <div class="container">
+    <div class="eyebrow section-eyebrow indent-l" style="color: rgba(0,0,0,0.5);">The Details</div>
+    <h2 class="display-section indent-l">
+      Where, when,<br><span style="display:inline-block; padding-left:6%;">and what to expect.</span>
+    </h2>
+
+    <div class="indent-l" style="margin-top: 80px;">
+
+      <div class="detail-row">
+        <div>
+          <div class="label-kicker">Where</div>
+          <h3><a href="https://holos.global" target="_blank" rel="noopener" class="holos-link">Holos</a> — Diamante Valley</h3>
+        </div>
+        <div>
+          <p>The study will be completed at the site of Acraya's first two dark rooms, located at the extraordinary <a href="https://holos.global" target="_blank" rel="noopener" class="holos-link">Holos retreat center</a> in the Diamante Valley, Costa Rica, and will feature our unique, patent-pending dark-room technology.</p>
+          <figure class="dark-room-gallery">
+            <div class="dark-room-photo">
+              <img src="https://images.squarespace-cdn.com/content/v1/618ac96b4ed9db522152c95a/8fa0278c-7812-4c37-80ac-d4ace23d9a73/Acraya+Image+1.png" alt="The dark meditation sanctuary at Holos — exterior view" loading="lazy">
+            </div>
+            <div class="dark-room-photo">
+              <img src="https://images.squarespace-cdn.com/content/v1/618ac96b4ed9db522152c95a/8b071792-c7d5-4dec-a4c0-636b9ebe9479/Acraya+Image+2.png" alt="The dark meditation sanctuary at Holos — interior view" loading="lazy">
+            </div>
+            <figcaption>The purpose-built dark sanctuaries at <a href="https://holos.global" target="_blank" rel="noopener">Holos</a></figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <div>
+          <div class="label-kicker">When</div>
+          <h3>October – December 2026</h3>
+        </div>
+        <div>
+          <p>The study will run from October 1, 2026 through the end of December 2026. There are two dark rooms, with five participants per month per room. Exact dates depend on availability.</p>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <div>
+          <div class="label-kicker">Who</div>
+          <h3>Who can take part</h3>
+        </div>
+        <div>
+          <ul>
+            <li>Adults approximately 21 to 65 years of age.</li>
+            <li>Joining the study far enough ahead of your retreat for the pre-retreat comparison stage.</li>
+            <li>Cleared through the study's screening process — a brief health and mental-health questionnaire and an interview with a qualified mental health professional.</li>
+            <li>Certain conditions (some mental health conditions, certain heart conditions, seizure disorders, pregnancy, or breastfeeding) may make the study unsafe — screening helps protect you.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <div>
+          <div class="label-kicker">Requirements</div>
+          <h3>What we'll ask of you</h3>
+        </div>
+        <div>
+          <p>To take part, you'll provide:</p>
+          <ul>
+            <li><strong style="font-weight: 600;">Saliva samples</strong> at several points (before, during, and after your retreat). No needles, no bloodwork — just a small amount of spit collected in a tube or via a small swab. Samples are analyzed for natural stress-related chemicals like cortisol.</li>
+            <li><strong style="font-weight: 600;">Questionnaires</strong> at several points across the study — before your retreat (Stage 1, the comparison stage), around your retreat, and after you come out, plus two remote follow-ups.</li>
+            <li><strong style="font-weight: 600;">Consent to non-contact room sensors</strong> during your dark retreat — a radar-based presence/breathing/heart-rate sensor, a thermal camera (no visible-light photos or video; the room stays completely dark), and a microphone/speaker system for safety and communication. You wear no devices.</li>
+          </ul>
+          <p style="margin-top: 16px;">In addition, you'll be required to work one-on-one with one of our qualified facilitators — see Required Facilitation below.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ──────────────────── THE JOURNEY ──────────────────── -->
+<section class="light" id="journey" data-screen-label="04 The Journey">
+  <div class="container indent-l">
+    <div class="eyebrow section-eyebrow" style="color: rgba(0,0,0,0.5);">The Journey</div>
+    <h2 class="display-section">
+      What your journey<br><span style="display:inline-block; padding-left:8%;">will look like.</span>
+    </h2>
+    <p class="lede" style="margin-top: 40px; max-width: 780px;">
+      You'll spend a total of 6 nights at Holos. The dark retreat portion of the study is <strong style="font-weight: 600;">4 nights / 3 full days in darkness</strong>, identical for every participant, so that results are consistent across the group.
+    </p>
+
+    <div class="timeline" style="margin-top: 56px; max-width: 980px;">
+      <div class="day">
+        <div class="when">Before retreat</div>
+        <div class="what">Preparation call with your facilitator.</div>
+      </div>
+      <div class="day">
+        <div class="when">Day 1</div>
+        <div class="what">Travel day. Arrive at Holos.</div>
+      </div>
+      <div class="day">
+        <div class="when">Day 2</div>
+        <div class="what">Turn off devices, complete your final pre-retreat check-in with your facilitator, relax and ground. Before entry, you'll complete questionnaires, basic health checks (e.g., blood pressure), provide a saliva sample, and spend a short, supervised familiarization period in the dark room. At sunset, you enter the darkness. The study begins.</div>
+      </div>
+      <div class="day">
+        <div class="when">Days 3, 4, 5</div>
+        <div class="what">Three full days in darkness. Daily check-ins with your facilitator via our in-room technology. All meals provided. Non-contact room sensors record information throughout.</div>
+      </div>
+      <div class="day">
+        <div class="when">Day 6</div>
+        <div class="what">Leave the darkness at dawn, just before sunrise. Provide a saliva sample, complete questionnaires, and have a post-retreat conversation with the team. Take the day for integration and relaxation.</div>
+      </div>
+      <div class="day">
+        <div class="when">Day 7</div>
+        <div class="what">Travel day home — or extend your stay at Holos in another room, if preferred.</div>
+      </div>
+      <div class="day">
+        <div class="when">Day 8+</div>
+        <div class="what">Integration session with your facilitator.</div>
+      </div>
+    </div>
+
+    <div class="hairline"></div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 48px; max-width: 980px;">
+      <div>
+        <div class="label-kicker">Stage 1 — Before</div>
+        <h3 style="margin-top: 10px;">The comparison stage</h3>
+        <p style="margin-top: 14px;">In the weeks before your retreat, you'll complete two sets of questionnaires and provide two saliva samples. You don't enter the dark room during this stage. This gives the study team a fair baseline to compare your retreat experience against — which is why joining early enough matters.</p>
+      </div>
+      <div>
+        <div class="label-kicker">After your retreat</div>
+        <h3 style="margin-top: 10px;">Two remote check-ins</h3>
+        <p style="margin-top: 14px;">About 7 days and again about 30 days after you come out, the team will check in with you remotely — a secure form or a call — to ask how you're feeling.</p>
+      </div>
+      <div>
+        <div class="label-kicker">Total time</div>
+        <h3 style="margin-top: 10px;">5 – 6 weeks</h3>
+        <p style="margin-top: 14px;">Your overall involvement in the study lasts about 5 to 6 weeks, from screening through to the final follow-up.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ──────────────────── PRIVACY ──────────────────── -->
+<section class="light" id="privacy" data-screen-label="05 Privacy">
+  <div class="container indent-l" style="max-width: 980px;">
+    <div class="eyebrow section-eyebrow" style="color: rgba(0,0,0,0.5);">Privacy and your rights</div>
+    <p class="lede" style="font-size: 22px;">
+      Your study information is labeled with a code, not your name. Information is stored on secure, encrypted systems. Published results describe groups of people, not individuals — you will not be identified in any publication.
+    </p>
+    <p style="margin-top: 24px; font-size: 18px; max-width: 720px;">
+      Participation is voluntary and you may stop at any time without penalty. Full details are provided in the Informed Consent Form, which you'll review and sign before joining the study.
+    </p>
+  </div>
+</section>
+
+<!-- ──────────────────── FACILITATION ──────────────────── -->
+<section class="dark" id="facilitation" data-screen-label="06 Facilitation">
+  <div class="container indent-l">
+    <div class="eyebrow section-eyebrow">Required Facilitation</div>
+    <h2 class="display-section">
+      Facilitation is part<br><span style="display:inline-block; padding-left:6%;">of the study design.</span>
+    </h2>
+    <p class="lede" style="margin-top: 40px; max-width: 780px;">
+      To ensure your safety, your comfort, and consistency across the study, all participants are required to receive facilitation before, during, and after their retreat. This protects both you and the integrity of the data.
+    </p>
+    <h3 style="margin-top: 56px; font-family: var(--font-display); font-weight: 300; font-size: 22px; letter-spacing: 0.12em; text-transform: uppercase;">Facilitation includes</h3>
+    <ul class="fac-list" style="margin-top: 16px;">
+      <li><strong style="font-weight: 500;">1× 1-hour</strong> one-on-one preparation session before your dark retreat.</li>
+      <li><strong style="font-weight: 500;">1× 1-hour</strong> one-on-one session during your dark retreat — or, if you prefer, shifted to an additional post-retreat integration session.</li>
+      <li><strong style="font-weight: 500;">1× 1-hour</strong> one-on-one integration session after your dark retreat.</li>
+      <li><strong style="font-weight: 500;">2× 15-minute</strong> check-in sessions during your dark retreat.</li>
+    </ul>
+    <p style="margin-top: 36px; max-width: 720px; opacity: 0.85;">
+      You'll work with your facilitator to focus on the areas that matter most to you and your growth, and you'll also cover the basic skills and tools you need to navigate your dark retreat with confidence.
+    </p>
+  </div>
+</section>
+
+<!-- ──────────────────── COST ──────────────────── -->
+<section class="light" id="cost" data-screen-label="07 Cost">
+  <div class="container indent-l">
+    <div class="eyebrow section-eyebrow" style="color: rgba(0,0,0,0.5);">Cost</div>
+    <h2 class="display-section">
+      Discounted for this<br><span style="display:inline-block; padding-left:6%;">research period.</span>
+    </h2>
+    <p class="lede" style="margin-top: 40px; max-width: 780px;">
+      To make this study as accessible as possible, we've discounted booking for this period, and we are covering all costs associated with labs and data collection.
+    </p>
+
+    <div class="cost-block" style="margin-top: 72px;">
+      <div>
+        <div class="label-kicker">Approximate total</div>
+        <div class="cost-total"><span class="currency">$</span>2,795<span class="plus">Plus local taxes &amp; fees</span></div>
+      </div>
+      <div class="cost-breakdown">
+        <div class="cost-line">
+          <span class="name">Holos stay — 7 days, 6 nights</span>
+          <span class="amt">$2,100</span>
+        </div>
+        <div class="cost-line">
+          <span class="name">Discounted nightly rate</span>
+          <span class="amt">$350 / night</span>
+        </div>
+        <div class="cost-line">
+          <span class="name">Required facilitation (billed separately)</span>
+          <span class="amt">$695</span>
+        </div>
+        <div class="cost-line">
+          <span class="name">Lab work, sensors, data collection</span>
+          <span class="amt">Covered</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────────────── BOOKING ──────────────────── -->
+<section class="dark" id="book" data-screen-label="08 Reserve">
+  <div class="container indent-l">
+    <div class="eyebrow section-eyebrow">How to Book</div>
+    <h2 class="display-section">
+      If you're ready<br><span style="display:inline-block; padding-left:8%;">to make history.</span>
+    </h2>
+    <p class="lede" style="margin-top: 40px; max-width: 780px;">
+      We've extended this invitation to you because you are a friend or family. We'll be opening booking to the public on <strong style="font-weight: 600;">June 9th</strong>. Until then, fill in your details on the reservation sheet on the date window you'd like to participate.
+    </p>
+
+    <div class="book-gate" style="margin-top: 72px;">
+      <div style="font-family: var(--font-display); font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase; opacity: 0.7; margin-bottom: 20px;">
+        To activate the booking link below, please confirm:
+      </div>
+
+      <label class="gate-check">
+        <input type="checkbox" id="gate-1">
+        <span>
+          I have read the full study <a href="assets/Acraya-Dark-Room-Study-Consent-Form.docx" target="_blank" rel="noopener">Informed Consent Form</a> in its entirety <em style="font-style: italic; opacity: 0.7;">(like, actually!)</em> and understand the study, the risks, what will be asked of me, and how my information will be handled.
+        </span>
+      </label>
+
+      <label class="gate-check">
+        <input type="checkbox" id="gate-2">
+        <span>
+          I have carefully considered my schedule, energy, and other commitments, and have the capacity to participate. I understand that spaces in this study are extremely limited and that my reservation takes a slot another person may not be able to take if I cancel, thus potentially impacting the study, and will do my best to honor my commitment, emergencies notwithstanding.
+        </span>
+      </label>
+
+      <a id="reserve-cta" class="reserve-cta"
+         href="https://docs.google.com/spreadsheets/d/1YYtAFZUiP-2on84m93fC9Q1HgarJlRfcrblxT4HU3DE/edit"
+         target="_blank" rel="noopener"
+         aria-disabled="true">
+        Reserve a slot <span class="arrow"></span>
+      </a>
+      <div id="reserve-helper" class="reserve-helper">
+        ↑ Confirm both above to unlock the reservation sheet
+      </div>
+
+      <div class="booking-callout" role="note">
+        <div class="booking-callout-eyebrow">After Booking</div>
+        <p>After June 9th, once we've collected all <em>friends &amp; family</em> bookings, we'll contact you directly to ensure you meet all necessary requirements and finalize booking details and payment with you.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────────────── FAQ ──────────────────── -->
+<section class="light" id="faq" data-screen-label="09 FAQ">
+  <div class="container indent-l">
+    <div class="eyebrow section-eyebrow" style="color: rgba(0,0,0,0.5);">FAQ</div>
+    <h2 class="display-section">
+      Questions, answered.
+    </h2>
+
+    <div class="faq" style="margin-top: 56px; max-width: 980px;">
+      <details>
+        <summary>Can I do a longer or shorter dark retreat?<span class="plus"></span></summary>
+        <div class="answer">No. The dark retreat portion of this study is a fixed 4 nights / 3 full days for every participant. This consistency is essential to the study's validity.</div>
+      </details>
+      <details>
+        <summary>Can I withdraw if my plans change?<span class="plus"></span></summary>
+        <div class="answer">Yes — participation is voluntary and you may stop at any time. That said, spots are extremely limited, and a late cancellation prevents another person from taking part. Please commit only after carefully considering your schedule and capacity.</div>
+      </details>
+      <details>
+        <summary>I have dietary restrictions. Can you accommodate them?<span class="plus"></span></summary>
+        <div class="answer">Yes — the kitchen at Holos can accommodate virtually any dietary requirements. You'll have an opportunity at booking to share your needs, and we'll confirm with the Holos team.</div>
+      </details>
+      <details>
+        <summary>Can I use my own facilitator? Who will be facilitating?<span class="plus"></span></summary>
+        <div class="answer">No, not for this study. Due to study design requirements, we need a consistent facilitation approach across all participants. You'll be working with some of the world's most experienced dark-retreat facilitators.</div>
+      </details>
+      <details>
+        <summary>Do I have to give blood?<span class="plus"></span></summary>
+        <div class="answer">No — there is no bloodwork. The study uses saliva samples only. They're painless, involve no needle, and take just a small amount of spit.</div>
+      </details>
+      <details>
+        <summary>What about devices or wearables during the retreat?<span class="plus"></span></summary>
+        <div class="answer">You wear nothing. The room uses non-contact sensors — radar for presence, breathing, and heart rate; a thermal camera that senses heat rather than visible light; and a microphone/speaker system. The room stays completely dark.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────────────── CONTACT ──────────────────── -->
+<section class="light" id="contact" data-screen-label="10 Contact">
+  <div class="container indent-l">
+    <div class="eyebrow section-eyebrow" style="color: rgba(0,0,0,0.5);">Contact</div>
+    <h2 class="display-section">
+      Further questions?
+    </h2>
+    <p class="lede" style="margin-top: 36px; max-width: 780px;">
+      We'd love to hear from you. Complete the form below and we'll be in touch as soon as possible.
+    </p>
+
+    <form class="contact-form" onsubmit="event.preventDefault(); this.querySelector('.contact-submit').textContent = 'Message received — thank you';">
+      <div class="field"><label>First name</label><input type="text" required></div>
+      <div class="field"><label>Last name</label><input type="text" required></div>
+      <div class="field"><label>Email</label><input type="email" required></div>
+      <div class="field"><label>Referred by</label><input type="text"></div>
+      <div class="field full"><label>Your question</label><textarea rows="3"></textarea></div>
+      <button class="contact-submit" type="submit">Send <span style="display: inline-block; margin-left: 8px;">→</span></button>
+    </form>
+  </div>
+</section>
+
+<!-- ──────────────────── FOOTER ──────────────────── -->
+<footer class="foot">
+  <span>© Acraya · MMXXVI</span>
+  <span>Acraya × IACS Research Study · Holos, Costa Rica</span>
+</footer>
+
+<script>
+  // Gate the RESERVE button on both checkboxes
+  (function () {
+    const g1 = document.getElementById('gate-1');
+    const g2 = document.getElementById('gate-2');
+    const cta = document.getElementById('reserve-cta');
+    const helper = document.getElementById('reserve-helper');
+    function sync() {
+      const on = g1.checked && g2.checked;
+      cta.classList.toggle('active', on);
+      cta.setAttribute('aria-disabled', on ? 'false' : 'true');
+      helper.classList.toggle('gone', on);
+      if (on) {
+        helper.textContent = '✓ Booking sheet unlocked — opens in a new tab';
+      } else {
+        helper.textContent = '↑ Confirm both above to unlock the reservation sheet';
+      }
+    }
+    g1.addEventListener('change', sync);
+    g2.addEventListener('change', sync);
+    sync();
+  })();
+
+  // Mobile hamburger menu — toggles primary nav as a dropdown sheet
+  (function () {
+    const nav = document.querySelector('.nav');
+    const ham = nav.querySelector('.hamburger');
+    const links = nav.querySelector('.links');
+    const backdrop = document.querySelector('.nav-backdrop');
+    function setOpen(open) {
+      nav.classList.toggle('menu-open', open);
+      ham.setAttribute('aria-expanded', open ? 'true' : 'false');
+      ham.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    }
+    ham.addEventListener('click', () => setOpen(!nav.classList.contains('menu-open')));
+    backdrop.addEventListener('click', () => setOpen(false));
+    // Closing on a nav-link click feels right on mobile; harmless on desktop.
+    links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setOpen(false)));
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && nav.classList.contains('menu-open')) setOpen(false);
+    });
+    // Auto-close when resizing back up to desktop
+    const mq = window.matchMedia('(min-width: 901px)');
+    mq.addEventListener('change', (e) => { if (e.matches) setOpen(false); });
+  })();
+
+  // Smooth scroll
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', (e) => {
+      const id = a.getAttribute('href').slice(1);
+      const el = document.getElementById(id);
+      if (el) {
+        e.preventDefault();
+        window.scrollTo({ top: el.offsetTop - 30, behavior: 'smooth' });
+      }
+    });
+  });
+
+  // Light sweep on the meditation figure — drives --p (0 → 1) based on
+  // how far the figure has travelled through the viewport.
+  (function () {
+    const fig = document.querySelector('.meditation-figure');
+    const sweep = fig && fig.querySelector('.light-sweep');
+    if (!fig || !sweep) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      sweep.style.setProperty('--p', '0.5');
+      return;
+    }
+    let raf = 0;
+    function update() {
+      raf = 0;
+      const r = fig.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      // 0 when the figure top sits at the bottom of viewport,
+      // 1 when the figure bottom sits at the top of viewport.
+      const total = r.height + vh;
+      const travelled = vh - r.top;
+      let p = travelled / total;
+      p = Math.max(0, Math.min(1, p));
+      sweep.style.setProperty('--p', p.toFixed(3));
+    }
+    function onScroll() {
+      if (!raf) raf = requestAnimationFrame(update);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    update();
+  })();
+</script>
+
+<!-- Tweaks panel ─────────────────────────────────────────────────────── -->
+<div id="tweaks-root"></div>
+<script>
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "sphereSize": 280,
+    "sphereGlow": 1,
+    "showScrollCue": true,
+    "displayWeight": 200,
+    "sectionDensity": "regular",
+    "moonTint": "#FFFFFF",
+    "sweepIntensity": 0.3
+  }/*EDITMODE-END*/;
+</script>
+<script type="text/babel">
+  const DENSITY_PAD = { compact: '80px', regular: '120px', airy: '170px' };
+
+  function AcrayaTweaks() {
+    const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+    React.useEffect(() => {
+      const r = document.documentElement;
+      r.style.setProperty('--sphere-size', t.sphereSize + 'px');
+      r.style.setProperty('--sphere-glow', String(t.sphereGlow));
+      r.style.setProperty('--display-weight', String(t.displayWeight));
+      r.style.setProperty('--section-pad-y', DENSITY_PAD[t.sectionDensity] || '120px');
+      r.style.setProperty('--moon-tint', t.moonTint);
+      r.style.setProperty('--sweep-intensity', String(t.sweepIntensity));
+      const cue = document.querySelector('.scroll-cue');
+      if (cue) cue.style.display = t.showScrollCue ? '' : 'none';
+    }, [t]);
+
+    return (
+      <TweaksPanel title="Tweaks">
+        <TweakSection label="Hero">
+          <TweakSlider label="Sphere size" value={t.sphereSize}
+                       min={180} max={380} step={4} unit="px"
+                       onChange={(v) => setTweak('sphereSize', v)} />
+          <TweakSlider label="Sphere glow" value={t.sphereGlow}
+                       min={0} max={2} step={0.1}
+                       onChange={(v) => setTweak('sphereGlow', v)} />
+          <TweakToggle label="Show scroll cue" value={t.showScrollCue}
+                       onChange={(v) => setTweak('showScrollCue', v)} />
+        </TweakSection>
+
+        <TweakSection label="Type & layout">
+          <TweakSlider label="Display weight" value={t.displayWeight}
+                       min={100} max={500} step={50}
+                       onChange={(v) => setTweak('displayWeight', v)} />
+          <TweakRadio label="Density" value={t.sectionDensity}
+                      options={['compact','regular','airy']}
+                      onChange={(v) => setTweak('sectionDensity', v)} />
+        </TweakSection>
+
+        <TweakSection label="Light & tone">
+          <TweakColor label="Moon tint" value={t.moonTint}
+                      options={['#FFFFFF', '#FFE9C7', '#D4E2FF', '#F4D8FF']}
+                      onChange={(v) => setTweak('moonTint', v)} />
+          <TweakSlider label="Light sweep" value={t.sweepIntensity}
+                       min={0} max={0.6} step={0.05}
+                       onChange={(v) => setTweak('sweepIntensity', v)} />
+        </TweakSection>
+      </TweaksPanel>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('tweaks-root')).render(<AcrayaTweaks />);
+</script>
+
+</body>
+</html>
