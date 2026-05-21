@@ -1,0 +1,59 @@
+/* Shared base for all preview cards in /preview.
+   Each card is ~700px wide, variable height, padded.  */
+@import url("../colors_and_type.css");
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #0b0b0b;
+}
+
+.card {
+  width: 700px;
+  box-sizing: border-box;
+  padding: 24px 28px;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card.light {
+  background: #ffffff;
+  color: #000000;
+}
+
+.card-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.swatch {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+.swatch .chip {
+  width: 92px;
+  height: 92px;
+}
+.swatch .name {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 10px;
+  opacity: 0.8;
+}
+.swatch .hex {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  opacity: 0.55;
+}
+
+.mono { font-family: var(--font-mono); }

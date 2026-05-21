@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" role="img" aria-label="Acraya">
+  <defs>
+    <radialGradient id="acrayaSphere" cx="38%" cy="38%" r="60%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="1"></stop>
+      <stop offset="55%" stop-color="#D9D9D9" stop-opacity="1"></stop>
+      <stop offset="100%" stop-color="#7A7A7A" stop-opacity="1"></stop>
+    </radialGradient>
+    <radialGradient id="acrayaHalo" cx="50%" cy="50%" r="50%">
+      <stop offset="40%" stop-color="#FFFFFF" stop-opacity="0.0"></stop>
+      <stop offset="70%" stop-color="#FFFFFF" stop-opacity="0.18"></stop>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"></stop>
+    </radialGradient>
+  </defs>
+  
+  <circle cx="22" cy="30" r="22" fill="url(#acrayaHalo)"></circle>
+  
+  <circle cx="22" cy="30" r="11" fill="url(#acrayaSphere)"></circle>
+  
+  <text x="50" y="37" font-family="Jost, &#39;Helvetica Neue&#39;, Helvetica, sans-serif" font-size="20" font-weight="300" letter-spacing="4" fill="currentColor">ACRAYA</text>
+</svg>

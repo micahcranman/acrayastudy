@@ -1,0 +1,256 @@
+/* =========================================================================
+   ACRAYA — Colors & Type
+   Dark retreat sanctuaries for spiritual wanderers.
+
+   Two modes:
+     - Dark (default for hero, intro, contemplative content)
+     - Light (default for content pages, locations, body copy)
+
+   Use semantic vars (--fg, --bg) — they swap automatically inside .acraya-light.
+   ========================================================================= */
+
+/* ---------- WEB FONTS ----------------------------------------------------
+   NOTE TO BRAND OWNER: the original site uses a thin geometric sans
+   (likely a licensed typeface in the Söhne / Neue Haas Unica / Albra family).
+   We've substituted close Google Fonts matches — please send TTF/WOFF files
+   if you want the exact original. See README.md › "Typography substitution".
+*/
+@import url('https://fonts.googleapis.com/css2?family=Jost:wght@200..500&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  /* ====================== COLOR — RAW PALETTE ========================= */
+  /* Monochrome scale. No accent colors. Light leaks through type, never hue. */
+  --acraya-black:       #000000;   /* true black — sealed sanctuary */
+  --acraya-ink:         #0A0A0A;   /* near-black surfaces */
+  --acraya-charcoal:    #1A1A1A;   /* raised dark surfaces */
+  --acraya-graphite:    #2E2E2E;   /* dark border / muted dark fg */
+  --acraya-stone:       #5A5A5A;   /* mid-tone for secondary text on dark */
+  --acraya-ash:         #8A8A8A;   /* tertiary / hairlines on dark */
+  --acraya-fog:         #BFBFBF;   /* muted text on light, hairline on dark */
+  --acraya-mist:        #D9D9D9;   /* dividers on light */
+  --acraya-paper:       #EFEFEF;   /* off-white surface */
+  --acraya-bone:        #F5F5F3;   /* very subtle warm off-white */
+  --acraya-white:       #FFFFFF;   /* pure light — the sphere, the reveal */
+
+  /* The "moon" — only true source of color in the system. A radial glow. */
+  --acraya-moon-core:   #FFFFFF;
+  --acraya-moon-halo:   rgba(255, 255, 255, 0.18);
+  --acraya-moon-bloom:  rgba(255, 255, 255, 0.06);
+
+  /* ====================== SEMANTIC — DARK MODE (default) ============== */
+  --bg:           var(--acraya-black);
+  --bg-raised:    var(--acraya-ink);
+  --bg-elevated:  var(--acraya-charcoal);
+
+  --fg:           var(--acraya-white);
+  --fg-secondary: var(--acraya-fog);
+  --fg-tertiary:  var(--acraya-ash);
+  --fg-muted:     var(--acraya-stone);
+
+  --border:       rgba(255, 255, 255, 0.14);
+  --border-soft:  rgba(255, 255, 255, 0.06);
+  --divider:      rgba(255, 255, 255, 0.20);
+
+  --button-bg:    var(--acraya-white);
+  --button-fg:    var(--acraya-black);
+  --button-bg-hover: rgba(255, 255, 255, 0.88);
+
+  --ring:         rgba(255, 255, 255, 0.35);
+
+  /* ====================== TYPE — FAMILIES ============================= */
+  --font-display: "Jost", "Neue Haas Unica", "Helvetica Neue", system-ui, sans-serif;
+  --font-body:    "Inter", "Söhne", "Helvetica Neue", system-ui, sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* ====================== TYPE — SCALE ================================
+     Display is uppercase, very thin (200–300), generous letter-spacing.
+     Body is sentence case, regular weight, neutral tracking.
+  */
+  --fs-display-xl: clamp(64px, 8vw, 128px);  /* Hero — "SANCTUARIES FOR SPIRITUAL WANDERERS" */
+  --fs-display-lg: clamp(48px, 5.5vw, 88px); /* Section headlines — "DISCOVER THE ACRAYA" */
+  --fs-display-md: clamp(36px, 3.6vw, 56px); /* Sub-display — page titles */
+  --fs-h1:         clamp(28px, 2.6vw, 40px);
+  --fs-h2:         clamp(22px, 2vw, 30px);
+  --fs-h3:         18px;
+  --fs-eyebrow:    13px;     /* nav links, labels, tags */
+  --fs-body-lg:    19px;     /* primary body, retreat descriptions */
+  --fs-body:       16px;
+  --fs-body-sm:    14px;
+  --fs-caption:    12px;
+
+  --lh-display:    1.04;
+  --lh-heading:    1.15;
+  --lh-body:       1.55;
+  --lh-tight:      1.25;
+
+  --tracking-display: 0.02em;  /* tight but breathable */
+  --tracking-nav:     0.18em;  /* widely-tracked nav labels: "LOCATIONS" */
+  --tracking-eyebrow: 0.22em;
+  --tracking-body:    0.005em;
+
+  /* ====================== SPACING ===================================== */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  24px;
+  --space-6:  32px;
+  --space-7:  48px;
+  --space-8:  64px;
+  --space-9:  96px;
+  --space-10: 128px;
+  --space-11: 192px;   /* between full sections — Acraya breathes */
+
+  /* ====================== RADII ======================================= */
+  /* Acraya uses one shape only: the circle. */
+  --radius-none: 0;
+  --radius-sm:   2px;
+  --radius-md:   4px;       /* used sparingly on small chrome */
+  --radius-pill: 999px;     /* RESERVE button, all primary CTAs */
+  --radius-circle: 50%;     /* portraits, sphere, prev/next nav buttons */
+
+  /* ====================== BORDERS ===================================== */
+  --hairline:    1px solid var(--border);
+  --hairline-soft: 1px solid var(--border-soft);
+
+  /* ====================== SHADOWS / GLOW ==============================
+     Acraya does not use drop shadows. The only "elevation" is the moon
+     halo — a soft radial glow used on the brand mark and key moments.
+  */
+  --glow-soft:  0 0 24px var(--acraya-moon-halo);
+  --glow-bloom: 0 0 64px var(--acraya-moon-bloom);
+  --glow-moon:
+    0 0 12px rgba(255, 255, 255, 0.45),
+    0 0 36px rgba(255, 255, 255, 0.20),
+    0 0 96px rgba(255, 255, 255, 0.08);
+
+  /* ====================== MOTION ======================================
+     Slow, contemplative, no bounce. Cross-fades over translates.
+  */
+  --ease-out:   cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-in:    cubic-bezier(0.55, 0, 0.78, 0.32);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --dur-quick:  150ms;
+  --dur-base:   320ms;
+  --dur-slow:   600ms;
+  --dur-bloom:  1200ms;  /* sphere glow, fade-ins on scroll */
+}
+
+/* ============================== LIGHT MODE =================================
+   Inverts surface + foreground. Borders, dividers, and glow all retune.
+   Apply to a section or to <body> for full-page light pages (e.g. Locations).
+*/
+.acraya-light {
+  --bg:           var(--acraya-white);
+  --bg-raised:    var(--acraya-bone);
+  --bg-elevated:  var(--acraya-paper);
+
+  --fg:           var(--acraya-black);
+  --fg-secondary: var(--acraya-graphite);
+  --fg-tertiary:  var(--acraya-stone);
+  --fg-muted:     var(--acraya-ash);
+
+  --border:       rgba(0, 0, 0, 0.14);
+  --border-soft:  rgba(0, 0, 0, 0.06);
+  --divider:      rgba(0, 0, 0, 0.16);
+
+  --button-bg:    var(--acraya-black);
+  --button-fg:    var(--acraya-white);
+  --button-bg-hover: rgba(0, 0, 0, 0.85);
+
+  --ring:         rgba(0, 0, 0, 0.25);
+
+  --glow-soft:  none;
+  --glow-bloom: none;
+  --glow-moon:  none;
+}
+
+/* ============================== ELEMENT DEFAULTS =========================== */
+html, body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  letter-spacing: var(--tracking-body);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, .display, .display-lg, .display-xl {
+  font-family: var(--font-display);
+  font-weight: 200;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-display);
+  line-height: var(--lh-display);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.display-xl { font-size: var(--fs-display-xl); }
+.display-lg { font-size: var(--fs-display-lg); }
+.display-md { font-size: var(--fs-display-md); font-weight: 300; }
+
+h1 { font-size: var(--fs-h1); font-weight: 300; line-height: var(--lh-heading); }
+h2 { font-size: var(--fs-h2); font-weight: 300; line-height: var(--lh-heading); }
+h3 {
+  font-size: var(--fs-h3);
+  font-weight: 500;
+  line-height: var(--lh-tight);
+  text-transform: none;
+  letter-spacing: 0.04em;
+  font-family: var(--font-body);
+}
+
+p {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  margin: 0 0 1em 0;
+  text-wrap: pretty;
+}
+
+.lede {
+  font-size: var(--fs-body-lg);
+  line-height: 1.5;
+  color: var(--fg);
+}
+
+.eyebrow,
+.nav-link {
+  font-family: var(--font-display);
+  font-size: var(--fs-eyebrow);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-nav);
+  color: var(--fg);
+}
+
+.caption,
+small {
+  font-size: var(--fs-caption);
+  color: var(--fg-tertiary);
+  letter-spacing: 0.02em;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: opacity var(--dur-quick) var(--ease-out);
+}
+a:hover { opacity: 0.65; }
+
+hr {
+  border: 0;
+  height: 1px;
+  background: var(--divider);
+  margin: var(--space-7) 0;
+}
+
+/* Images default to grayscale on Acraya unless an opt-out class is added.
+   .acraya-color-image preserves full color (used on Location pages). */
+img.acraya-bw          { filter: grayscale(1) contrast(1.02); }
+img.acraya-color-image { filter: none; }
