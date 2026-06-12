@@ -713,6 +713,110 @@
 </template>
 <body style="font-size: 14px">
 
+<!-- ──────────────────── PASSWORD GATE ──────────────────── -->
+<style>
+  html.locked, html.locked body { overflow: hidden; }
+  html.locked #site-root { filter: blur(28px) saturate(0.7); pointer-events: none; user-select: none; }
+  #gate {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,0.78);
+    display: none;
+    align-items: center; justify-content: center;
+    font-family: var(--font-display, "Inter", system-ui, sans-serif);
+    color: #fff;
+  }
+  html.locked #gate { display: flex; }
+  #gate .gate-inner {
+    text-align: center;
+    padding: 40px 32px;
+    max-width: 420px;
+  }
+  #gate .gate-sphere {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: radial-gradient(circle at 38% 38%, #fff 0%, #d9d9d9 50%, #7a7a7a 100%);
+    box-shadow: 0 0 36px rgba(255,255,255,0.22);
+    margin: 0 auto 40px;
+  }
+  #gate .gate-label {
+    font-size: 11px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    opacity: 0.65;
+    margin-bottom: 18px;
+  }
+  #gate input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255,255,255,0.4);
+    color: #fff;
+    font-family: inherit;
+    font-size: 18px;
+    letter-spacing: 0.18em;
+    text-align: center;
+    padding: 12px 4px;
+    outline: none;
+  }
+  #gate input:focus { border-bottom-color: rgba(255,255,255,0.85); }
+  #gate .gate-hint {
+    margin-top: 22px;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    opacity: 0.45;
+    min-height: 16px;
+  }
+  #gate .gate-hint.error { opacity: 0.9; color: #f5a3a3; }
+</style>
+<div id="gate" aria-hidden="false">
+  <div class="gate-inner">
+    <div class="gate-sphere" aria-hidden="true"></div>
+    <div class="gate-label">Enter to continue</div>
+    <input id="gate-input" type="password" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Password">
+    <div id="gate-hint" class="gate-hint">&nbsp;</div>
+  </div>
+</div>
+<script>
+  (function () {
+    var KEY = 'acraya-v2-unlocked';
+    var PASS = 'darkness';
+    var html = document.documentElement;
+    function unlock() {
+      html.classList.remove('locked');
+      try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
+    }
+    function lock() { html.classList.add('locked'); }
+    var already = false;
+    try { already = sessionStorage.getItem(KEY) === '1'; } catch (e) {}
+    if (already) {
+      // stay unlocked, nothing to do
+    } else {
+      lock();
+      document.addEventListener('DOMContentLoaded', function () {
+        var input = document.getElementById('gate-input');
+        var hint = document.getElementById('gate-hint');
+        if (!input) return;
+        setTimeout(function () { input.focus(); }, 50);
+        input.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') {
+            if (input.value.trim().toLowerCase() === PASS) {
+              unlock();
+            } else {
+              hint.textContent = 'Incorrect';
+              hint.classList.add('error');
+              input.value = '';
+            }
+          } else {
+            hint.textContent = '\u00a0';
+            hint.classList.remove('error');
+          }
+        });
+      });
+    }
+  })();
+</script>
+<div id="site-root">
+
 <!-- ──────────────────── NAV ──────────────────── -->
 <nav class="nav">
   <a href="#top" class="brand">
@@ -1346,5 +1450,6 @@ If you choose to take part, you'll be one of roughly forty participants.
   ReactDOM.createRoot(document.getElementById('tweaks-root')).render(<AcrayaTweaks />);
 </script>
 
+</div><!-- /#site-root -->
 </body>
 </html>
