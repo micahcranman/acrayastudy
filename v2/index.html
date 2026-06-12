@@ -788,6 +788,8 @@
     function lock() { html.classList.add('locked'); }
     var already = false;
     try { already = sessionStorage.getItem(KEY) === '1'; } catch (e) {}
+    // Bypass gate in print mode (?print=1)
+    if (/[?&]print=1\b/.test(location.search)) { already = true; document.documentElement.classList.add('print-mode'); }
     if (already) {
       // stay unlocked, nothing to do
     } else {
@@ -1110,8 +1112,11 @@ If you choose to take part, you'll be one of roughly forty participants.
     </p>
 
     <div class="book-gate" style="margin-top: 72px;">
-      <div style="font-family: var(--font-display); font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase; opacity: 0.7; margin-bottom: 20px;">
+      <div class="book-gate-screen-heading" style="font-family: var(--font-display); font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase; opacity: 0.7; margin-bottom: 20px;">
         To activate the booking link below, please confirm:
+      </div>
+      <div class="book-gate-print-heading" style="display: none; font-family: var(--font-display); font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase; opacity: 0.7; margin-bottom: 20px;">
+        Before reserving, every participant confirms:
       </div>
 
       <label class="gate-check">
@@ -1451,5 +1456,61 @@ If you choose to take part, you'll be one of roughly forty participants.
 </script>
 
 </div><!-- /#site-root -->
+
+<!-- ──────────────────── PRINT MODE ──────────────────── -->
+<style>
+  /* Print-mode visual tweaks (apply both on-screen w/ ?print=1 and on @media print) */
+  html.print-mode .nav,
+  html.print-mode .nav-backdrop,
+  html.print-mode .scroll-cue,
+  html.print-mode #gate,
+  html.print-mode #reserve-cta,
+  html.print-mode #reserve-helper,
+  html.print-mode .book-gate .gate-check input[type="checkbox"] { display: none !important; }
+  html.print-mode .book-gate .gate-check {
+    display: list-item !important;
+    list-style: decimal inside;
+    margin: 12px 0 12px 6px;
+    padding: 0;
+    cursor: default;
+  }
+  html.print-mode .book-gate .gate-check span { margin-left: 4px; }
+  html.print-mode details > summary { list-style: none; pointer-events: none; }
+  html.print-mode details > summary .plus { display: none !important; }
+  html.print-mode details > summary { font-weight: 500; }
+  html.print-mode .book-gate-print-heading { display: block !important; }
+  html.print-mode .book-gate-screen-heading { display: none !important; }
+
+  @media print {
+    html, body { background: #fff !important; }
+    .nav, .nav-backdrop, .scroll-cue, #gate,
+    #reserve-cta, #reserve-helper,
+    .book-gate .gate-check input[type="checkbox"] { display: none !important; }
+    .book-gate .gate-check { display: list-item !important; list-style: decimal inside; margin: 10px 0; padding: 0; }
+    details { page-break-inside: avoid; }
+    section { page-break-inside: avoid; }
+    .book-gate-print-heading { display: block !important; }
+    .book-gate-screen-heading { display: none !important; }
+  }
+</style>
+<script>
+  (function () {
+    function applyPrintTweaks() {
+      // Open all FAQ <details>
+      document.querySelectorAll('details').forEach(function (d) { d.open = true; });
+      // Swap the booking gate heading
+      var screenH = document.querySelector('.book-gate-screen-heading');
+      var printH  = document.querySelector('.book-gate-print-heading');
+      if (screenH && printH) {
+        screenH.style.display = 'none';
+        printH.style.display = 'block';
+      }
+    }
+    if (/[?&]print=1\b/.test(location.search)) {
+      document.addEventListener('DOMContentLoaded', applyPrintTweaks);
+    }
+    window.addEventListener('beforeprint', applyPrintTweaks);
+  })();
+</script>
 </body>
 </html>
