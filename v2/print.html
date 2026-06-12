@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Acraya × IACS — A Study on Dark Retreats</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  /* ───────────────────────────── page setup ───────────────────────────── */
+  @page {
+    size: Letter;
+    margin: 0.85in 0.9in 0.95in;
+  }
+  @page :first { margin: 0; }
+
+  :root {
+    --ink:        #111111;
+    --ink-soft:   #2a2a2a;
+    --ink-mute:   #5a5a5a;
+    --ink-faint:  #8a8a8a;
+    --rule:       #d6d3cd;
+    --paper:      #fbfaf7;
+    --display:    "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    --serif:      "Source Serif 4", "Source Serif Pro", "Georgia", "Times New Roman", serif;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 11pt;
+    line-height: 1.55;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ───────────────────────────── typography ───────────────────────────── */
+  .eyebrow {
+    font-family: var(--display);
+    font-size: 8pt;
+    font-weight: 400;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--display);
+    font-weight: 300;
+    color: var(--ink);
+    margin: 0;
+  }
+  h2.section-title {
+    font-size: 22pt;
+    letter-spacing: 0.02em;
+    line-height: 1.12;
+    font-weight: 250;
+    margin: 0 0 6pt;
+  }
+  h3.sub {
+    font-family: var(--display);
+    font-size: 9pt;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--ink);
+    margin: 0 0 6pt;
+  }
+  h4.kicker {
+    font-family: var(--display);
+    font-size: 7.5pt;
+    letter-spacing: 0.30em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--ink-mute);
+    margin: 0 0 4pt;
+  }
+  p { margin: 0 0 9pt; }
+  a { color: var(--ink); text-decoration: none; border-bottom: 0.5pt solid var(--ink-faint); }
+  em { font-style: italic; }
+  strong { font-weight: 600; color: var(--ink); }
+  ul { margin: 0 0 9pt; padding-left: 18pt; }
+  ul li { margin-bottom: 5pt; }
+
+  /* hairline rule */
+  .hairline {
+    border: 0;
+    border-top: 0.5pt solid var(--rule);
+    margin: 14pt 0 14pt;
+  }
+
+  /* ───────────────────────────── cover ───────────────────────────── */
+  .cover {
+    page-break-after: always;
+    width: 8.5in;
+    height: 11in;
+    background: #000;
+    color: #fff;
+    position: relative;
+    padding: 1.1in 0.9in 0.9in;
+    display: flex;
+    flex-direction: column;
+  }
+  .cover .partnership {
+    font-family: var(--display);
+    font-size: 8.5pt;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.75);
+  }
+  .cover .partnership .dot {
+    display: inline-block; width: 3pt; height: 3pt; border-radius: 50%;
+    background: rgba(255,255,255,0.55);
+    margin: 0 10pt; vertical-align: 3pt;
+  }
+  .cover .sphere {
+    width: 1.6in; height: 1.6in; border-radius: 50%;
+    background: radial-gradient(circle at 38% 36%, #fff 0%, #e8e8e8 42%, #6e6e6e 100%);
+    box-shadow: 0 0 90px rgba(255,255,255,0.20);
+    margin: 0.55in 0 0.65in;
+  }
+  .cover h1.cover-title {
+    font-family: var(--display);
+    font-weight: 200;
+    font-size: 44pt;
+    line-height: 1.04;
+    letter-spacing: -0.005em;
+    color: #fff;
+    max-width: 6.2in;
+  }
+  .cover h1.cover-title em {
+    font-style: normal;
+    font-weight: 300;
+    color: rgba(255,255,255,0.78);
+  }
+  .cover .subtitle {
+    margin-top: 0.45in;
+    font-family: var(--display);
+    font-size: 10pt;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.78);
+  }
+  .cover .spacer { flex: 1; }
+  .cover .footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    font-family: var(--display);
+    font-size: 8pt;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+  }
+
+  /* ───────────────────────────── content sections ───────────────────────────── */
+  section.doc {
+    padding-top: 6pt;
+    break-inside: avoid-page;
+  }
+  section.doc + section.doc {
+    margin-top: 18pt;
+  }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14pt;
+    margin-bottom: 16pt;
+    border-bottom: 0.5pt solid var(--rule);
+    padding-bottom: 10pt;
+  }
+  .section-head .num {
+    font-family: var(--display);
+    font-size: 8pt;
+    letter-spacing: 0.28em;
+    color: var(--ink-faint);
+    font-weight: 500;
+    width: 0.4in;
+    flex-shrink: 0;
+  }
+  .section-head .title {
+    flex: 1;
+  }
+  .section-head .title .eyebrow { margin-bottom: 4pt; display: block; }
+
+  /* two-column layout for detail rows */
+  .row {
+    display: grid;
+    grid-template-columns: 1.4in 1fr;
+    gap: 22pt;
+    margin-bottom: 16pt;
+    break-inside: avoid;
+  }
+  .row .left h3 { font-family: var(--display); font-size: 11pt; font-weight: 400; letter-spacing: 0; text-transform: none; margin: 0; line-height: 1.3; }
+  .row .right { font-size: 11pt; }
+  .row .right p:last-child, .row .right ul:last-child { margin-bottom: 0; }
+
+  /* timeline */
+  .timeline { margin: 4pt 0 6pt; }
+  .timeline .day {
+    display: grid;
+    grid-template-columns: 1in 1fr;
+    gap: 22pt;
+    padding: 9pt 0;
+    border-top: 0.5pt solid var(--rule);
+    break-inside: avoid;
+  }
+  .timeline .day:last-child { border-bottom: 0.5pt solid var(--rule); }
+  .timeline .when {
+    font-family: var(--display);
+    font-size: 8pt;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 500;
+    padding-top: 1pt;
+  }
+  .timeline .what { font-size: 10.5pt; line-height: 1.5; }
+
+  /* stage cards */
+  .stages {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 18pt;
+    margin-top: 10pt;
+  }
+  .stages .stage {
+    padding: 12pt 0 0;
+    border-top: 0.5pt solid var(--ink);
+    break-inside: avoid;
+  }
+  .stages .stage h3 { font-family: var(--display); font-size: 11pt; font-weight: 400; letter-spacing: 0; margin: 4pt 0 6pt; }
+  .stages .stage p { font-size: 10pt; line-height: 1.5; }
+
+  /* facilitation list */
+  ul.fac-list { list-style: none; padding: 0; margin: 6pt 0 0; }
+  ul.fac-list li {
+    padding: 8pt 0;
+    border-top: 0.5pt solid var(--rule);
+    font-size: 10.5pt;
+    display: grid;
+    grid-template-columns: 0.95in 1fr;
+    gap: 16pt;
+  }
+  ul.fac-list li:last-child { border-bottom: 0.5pt solid var(--rule); }
+  ul.fac-list li .qty { font-family: var(--display); font-size: 9pt; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); font-weight: 500; }
+
+  /* cost block */
+  .cost-grid {
+    display: grid;
+    grid-template-columns: 1.6in 1fr;
+    gap: 28pt;
+    align-items: start;
+  }
+  .cost-total {
+    font-family: var(--display);
+    font-weight: 200;
+    font-size: 36pt;
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+  .cost-total .curr { font-size: 18pt; vertical-align: 14pt; opacity: 0.65; margin-right: 2pt; }
+  .cost-total .plus {
+    display: block;
+    font-family: var(--display);
+    font-size: 7.5pt;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 500;
+    margin-top: 8pt;
+  }
+  .cost-lines { font-size: 10.5pt; }
+  .cost-lines .line {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 18pt;
+    padding: 9pt 0;
+    border-top: 0.5pt solid var(--rule);
+  }
+  .cost-lines .line:last-child { border-bottom: 0.5pt solid var(--rule); }
+  .cost-lines .name .sub { display: block; font-size: 9pt; color: var(--ink-mute); margin-top: 2pt; }
+  .cost-lines .amt { font-family: var(--display); font-size: 10pt; letter-spacing: 0.04em; }
+
+  /* booking attestations */
+  ol.attest {
+    list-style: none;
+    counter-reset: attest;
+    padding: 0; margin: 0;
+  }
+  ol.attest li {
+    counter-increment: attest;
+    padding: 11pt 0 11pt 0.45in;
+    border-top: 0.5pt solid var(--rule);
+    position: relative;
+    font-size: 10.5pt;
+    line-height: 1.5;
+    break-inside: avoid;
+  }
+  ol.attest li:last-child { border-bottom: 0.5pt solid var(--rule); }
+  ol.attest li::before {
+    content: counter(attest, decimal-leading-zero);
+    position: absolute;
+    left: 0; top: 12pt;
+    font-family: var(--display);
+    font-size: 9pt;
+    letter-spacing: 0.18em;
+    color: var(--ink-mute);
+    font-weight: 500;
+  }
+
+  /* callout note */
+  .callout {
+    margin-top: 16pt;
+    padding: 14pt 16pt;
+    background: #f1ede5;
+    border-left: 2pt solid var(--ink);
+    font-size: 10.5pt;
+    break-inside: avoid;
+  }
+  .callout .label {
+    font-family: var(--display);
+    font-size: 7.5pt;
+    letter-spacing: 0.30em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 6pt;
+    font-weight: 500;
+    display: block;
+  }
+  .callout p:last-child { margin-bottom: 0; }
+
+  /* FAQ */
+  .faq .q {
+    break-inside: avoid;
+    padding: 11pt 0;
+    border-top: 0.5pt solid var(--rule);
+  }
+  .faq .q:last-child { border-bottom: 0.5pt solid var(--rule); }
+  .faq .q h3 {
+    font-family: var(--display);
+    font-size: 10.5pt;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+    margin: 0 0 5pt;
+    color: var(--ink);
+  }
+  .faq .q p { font-size: 10.5pt; margin: 0; color: var(--ink-soft); }
+
+  /* photograph */
+  figure.photo {
+    margin: 14pt 0 0;
+    break-inside: avoid;
+  }
+  figure.photo img {
+    width: 100%; height: 1.9in; object-fit: cover; display: block;
+    background: #0a0a0a;
+  }
+  figure.photo figcaption {
+    margin-top: 5pt;
+    font-family: var(--display);
+    font-size: 7.5pt;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+
+  /* running footer via @page would need paged.js; instead, a closing colophon page */
+  .colophon {
+    margin-top: 28pt;
+    padding-top: 14pt;
+    border-top: 0.5pt solid var(--rule);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28pt;
+    font-size: 9pt;
+    color: var(--ink-mute);
+    line-height: 1.55;
+  }
+  .colophon .block .lbl {
+    font-family: var(--display);
+    font-size: 7.5pt;
+    letter-spacing: 0.30em;
+    text-transform: uppercase;
+    color: var(--ink);
+    font-weight: 500;
+    display: block;
+    margin-bottom: 4pt;
+  }
+
+  /* avoid orphan headings */
+  h2, h3 { break-after: avoid-page; }
+  .row, .timeline .day, .stages .stage, ul.fac-list li, .cost-lines .line,
+  ol.attest li, .faq .q, figure.photo, .callout, .stages { break-inside: avoid; }
+
+  /* page padding wrapper for non-cover pages */
+  .body {
+    /* @page margins handle outer padding */
+  }
+</style>
+</head>
+
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     COVER
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="partnership">
+    <span>Acraya</span><span class="dot"></span><span>IACS</span><span class="dot"></span><span>Holos · Costa Rica</span>
+  </div>
+
+  <div class="sphere" aria-hidden="true"></div>
+
+  <h1 class="cover-title">
+    A study on<br>
+    dark&nbsp;retreats,<br>
+    <em>in partnership<br>with IACS.</em>
+  </h1>
+
+  <div class="subtitle">Holos &middot; Diamante Valley &middot; Costa Rica</div>
+
+  <div class="spacer"></div>
+
+  <div class="footer-row">
+    <div>Review draft &middot; v2</div>
+    <div>June 2026</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     BODY
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div class="body">
+
+  <!-- INVITATION ─────────────────────────────────────────────────────── -->
+  <section class="doc">
+    <div class="section-head">
+      <div class="num">01</div>
+      <div class="title">
+        <span class="eyebrow">Invitation</span>
+        <h2 class="section-title">You have been personally invited.</h2>
+      </div>
+    </div>
+
+    <p style="font-size: 12pt; line-height: 1.6;">
+      Acraya has partnered with the <strong>Institute for Advanced Consciousness Studies (IACS)</strong>, a non-profit research institute studying consciousness and wellbeing, in a study to gather data on the effects of dark-room retreats.
+    </p>
+
+    <p style="font-size: 11pt;">
+      The Principal Investigator is <strong>Dr.&nbsp;Nicco Reggente</strong> of IACS. <strong>Dr.&nbsp;Matthew Sacchet</strong> of the Harvard Meditation Research Program at Harvard Medical School and Massachusetts General Hospital is the Co-Investigator and Consultant.
+    </p>
+
+    <div class="hairline"></div>
+
+    <p style="font-size: 11pt;">If you choose to take part, you will be one of roughly <strong>forty participants</strong>.</p>
+  </section>
+
+  <!-- THE DETAILS ────────────────────────────────────────────────────── -->
+  <section class="doc">
+    <div class="section-head">
+      <div class="num">02</div>
+      <div class="title">
+        <span class="eyebrow">The Details</span>
+        <h2 class="section-title">Where, when, and what to expect.</h2>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="left">
+        <h4 class="kicker">Where</h4>
+        <h3>Holos &mdash; Diamante&nbsp;Valley</h3>
+      </div>
+      <div class="right">
+        <p>The study will be completed at the site of Acraya's first two dark rooms, located at the <a href="https://holos.global/darkroom">Holos retreat center</a> in the Diamante Valley, Costa Rica, and will feature our patent-pending dark-room technology.</p>
+        <p style="font-size: 10pt; color: var(--ink-mute);"><em>Please note:</em> bookings for the study must be made through the study site &mdash; not through Holos directly.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="left">
+        <h4 class="kicker">When</h4>
+        <h3>October &ndash; December 2026</h3>
+      </div>
+      <div class="right">
+        <p>The study will run from October&nbsp;1, 2026 through the end of December 2026. There are two dark rooms, with five participants per month per room. Exact dates depend on availability.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="left">
+        <h4 class="kicker">Who</h4>
+        <h3>Who can take part</h3>
+      </div>
+      <div class="right">
+        <ul>
+          <li>Adults approximately 21 to 65 years of age.</li>
+          <li>Joining the study far enough ahead of your retreat for the pre-retreat comparison stage.</li>
+          <li>Cleared through the study's screening process &mdash; a brief health and mental-health questionnaire and an interview with a qualified mental health professional.</li>
+          <li>Certain conditions (some mental health conditions, certain heart conditions, seizure disorders, pregnancy, or breastfeeding) may make the study unsafe &mdash; screening helps protect you.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="left">
+        <h4 class="kicker">Requirements</h4>
+        <h3>What we'll ask of you</h3>
+      </div>
+      <div class="right">
+        <p>To take part, you'll provide:</p>
+        <ul>
+          <li><strong>Biological samples</strong> at several points before, immediately around (entry / exit), and after your retreat. This includes <strong>saliva samples</strong> and <strong>blood draws</strong> performed by a qualified phlebotomist. Samples are analyzed for natural stress-related and neurochemical markers such as cortisol.</li>
+          <li><strong>Questionnaires</strong> at several points across the study &mdash; before your retreat (Stage&nbsp;1, the comparison stage), immediately before entering the dark room, immediately after exiting, and via two remote follow-ups. <em>No questionnaires are administered while you are in the dark.</em></li>
+          <li><strong>Consent to non-contact room sensors</strong> during your dark retreat &mdash; a radar-based presence / breathing / heart-rate sensor, a thermal camera (no visible-light photos or video; the room stays completely dark), and a microphone / speaker system for safety and communication. You wear no devices.</li>
+        </ul>
+        <p style="margin-top: 8pt;">In addition, you'll work one-on-one with one of our qualified facilitators &mdash; see <em>Required Facilitation</em>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE JOURNEY ────────────────────────────────────────────────────── -->
+  <section class="doc">
+    <div class="section-head">
+      <div class="num">03</div>
+      <div class="title">
+        <span class="eyebrow">The Journey</span>
+        <h2 class="section-title">What your journey will look like.</h2>
+      </div>
+    </div>
+
+    <p>You'll spend a total of <strong>6 nights at Holos</strong>. The dark retreat portion of the study is <strong>4 nights / 3 full days in darkness</strong>, identical for every participant, so that results are consistent across the group.</p>
+
+    <div class="timeline">
+      <div class="day"><div class="when">Before retreat</div><div class="what">Preparation call with your facilitator.</div></div>
+      <div class="day"><div class="when">Day 1</div><div class="what">Travel day. Arrive at Holos.</div></div>
+      <div class="day"><div class="when">Day 2</div><div class="what">Turn off devices, complete your final pre-retreat check-in with your facilitator, relax and ground. Before entry, you'll complete questionnaires, basic health checks (e.g., blood pressure), provide saliva and blood samples, and spend a short, supervised familiarization period in the dark room. At sunset, you enter the darkness. The study begins.</div></div>
+      <div class="day"><div class="when">Days 3, 4, 5</div><div class="what">Three full days in darkness. Daily check-ins with your facilitator via our in-room technology. All food and beverage included, prepared by the Holos kitchen and brought to you. Non-contact room sensors record information throughout. No questionnaires while in the dark.</div></div>
+      <div class="day"><div class="when">Day 6</div><div class="what">Leave the darkness at dawn, just before sunrise. Provide saliva and blood samples, complete questionnaires, and have a post-retreat conversation with the team. Take the day for integration and relaxation.</div></div>
+      <div class="day"><div class="when">Day 7</div><div class="what">Travel day home &mdash; or extend your stay at Holos in another room, if preferred.</div></div>
+      <div class="day"><div class="when">Day 8+</div><div class="what">Integration session with your facilitator.</div></div>
+    </div>
+
+    <div class="stages">
+      <div class="stage">
+        <h4 class="kicker">Stage 1 — Before</h4>
+        <h3>The comparison stage</h3>
+        <p>In the weeks before your retreat, you'll complete two sets of questionnaires and provide saliva and blood samples. You don't enter the dark room during this stage. This gives the study team a baseline to compare your retreat experience against.</p>
+      </div>
+      <div class="stage">
+        <h4 class="kicker">After your retreat</h4>
+        <h3>Two remote check-ins</h3>
+        <p>About 7 days and again about 30 days after you come out, the team will check in with you remotely &mdash; a secure form or a call &mdash; to ask how you're feeling.</p>
+      </div>
+      <div class="stage">
+        <h4 class="kicker">Total time</h4>
+        <h3>5 – 6 weeks</h3>
+        <p>Your overall involvement in the study lasts about 5 to 6 weeks, from screening through to the final follow-up.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRIVACY ────────────────────────────────────────────────────────── -->
+  <section class="doc">
+    <div class="section-head">
+      <div class="num">04</div>
+      <div class="title">
+        <span class="eyebrow">Privacy &amp; Your Rights</span>
+        <h2 class="section-title">Your information, protected.</h2>
+      </div>
+    </div>
+
+    <p style="font-size: 12pt; line-height: 1.6;">Your study information is labeled with a code, not your name. Information is stored on secure, encrypted systems. Published results describe groups of people, not individuals &mdash; you will not be identified in any publication.</p>
+
+    <p>Participation is voluntary and you may stop at any time without penalty. Full details are provided in the Informed Consent Form, which you'll review and sign before joining the study.</p>
+  </section>
+
+  <!-- FACILITATION ───────────────────────────────────────────────────── -->
+  <section class="doc">
+    <div class="section-head">
+      <div class="num">05</div>
+      <div class="title">
+        <span class="eyebrow">Required Facilitation</span>
+        <h2 class="section-title">Facilitation is part of the study design.</h2>
+      </div>
+    </div>
+
+    <p>To ensure your safety, your comfort, and consistency across the study, all participants are required to receive facilitation before, during, and after their retreat. This protects both you and the integrity of the data.</p>
+
+    <h3 class="sub" style="margin-top: 16pt;">Facilitation includes</h3>
+    <ul class="fac-list">
+      <li><span class="qty">1 × 1 hour</span><span>One-on-one preparation session before your dark retreat.</span></li>
+      <li><span class="qty">1 × 1 hour</span><span>One-on-one session during your dark retreat &mdash; or, if you prefer, shifted to an additional post-retreat integration session.</span></li>
+      <li><span class="qty">1 × 1 hour</span><span>One-on-one integration session after your dark retreat.</span></li>
+      <li><span class="qty">2 × 15 min</span><span>Check-in sessions during your dark retreat.</span></li>
+    </ul>
+
+    <p style="margin-top: 12pt;">You'll work with your facilitator to focus on the areas that matter most to you, and you'll also cover the basic skills and tools you need to navigate your dark retreat.</p>
+  </section>
+
+  <!-- COST ───────────────────────────────────────────────────────────── -->
+  <section class="doc">
+    <div class="section-head">
+      <div class="num">06</div>
+      <div class="title">
+        <span class="eyebrow">Cost</span>
+        <h2 class="section-title">Soft-launch rates, before they rise.</h2>
+      </div>
+    </div>
+
+    <p>We're keeping rates as accessible as possible during this initial study period, and Acraya is covering all lab work, sensors, and data-collection costs. After this soft-launch window closes, rates will be going up.</p>
+
+    <div class="cost-grid" style="margin-top: 16pt;">
+      <div>
+        <h4 class="kicker">Total</h4>
+        <div class="cost-total"><span class="curr">$</span>2,795<span class="plus">Plus local taxes &amp; fees</span></div>
+      </div>
+      <div class="cost-lines">
+        <div class="line">
+          <span class="name">Holos stay &mdash; 7 days, 6 nights<span class="sub">All food &amp; beverage included throughout your stay</span></span>
+          <span class="amt">$2,100</span>
+        </div>
+        <div class="line">
+          <span class="name">Soft-launch nightly rate</span>
+          <span class="amt">$350 / night</span>
+        </div>
+        <div class="line">
+          <span class="name">Required facilitation (billed separately)</span>
+          <span class="amt">$695</span>
+        </div>
+        <div class="line">
+          <span class="name">Lab work, sensors, data collection</span>
+          <span class="amt">Covered</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOOKING ────────────────────────────────────────────────────────── -->
+  <section class="doc">
+    <div class="section-head">
+      <div class="num">07</div>
+      <div class="title">
+        <span class="eyebrow">How to Book</span>
+        <h2 class="section-title">If you're ready to participate.</h2>
+      </div>
+    </div>
+
+    <p>Friends and family bookings are open by personal invitation. Public booking opens <strong>June&nbsp;22, 2026</strong>. Until then, invited participants reserve a date window directly through the study reservation sheet.</p>
+
+    <h3 class="sub" style="margin-top: 18pt;">Before reserving, every participant confirms</h3>
+    <ol class="attest">
+      <li>I have read the full study <strong>Informed Consent Form</strong> in its entirety and understand the study, the risks, what will be asked of me, and how my information will be handled.</li>
+      <li>I have carefully considered my schedule, energy, and other commitments, and have the capacity to participate. I understand that spaces in this study are extremely limited and that my reservation takes a slot another person may not be able to take if I cancel, and will do my best to honor my commitment, emergencies notwithstanding.</li>
+      <li>I understand that my booking is <strong>non-refundable once I commit</strong>.</li>
+    </ol>
+
+    <div class="callout">
+      <span class="label">After Booking</span>
+      <p>After June&nbsp;22, once we've collected all <em>friends &amp; family</em> bookings, we'll contact you directly to ensure you meet all necessary requirements and finalize booking details and payment with you.</p>
+    </div>
+  </section>
+
+  <!-- FAQ ────────────────────────────────────────────────────────────── -->
+  <section class="doc">
+    <div class="section-head">
+      <div class="num">08</div>
+      <div class="title">
+        <span class="eyebrow">FAQ</span>
+        <h2 class="section-title">Questions, answered.</h2>
+      </div>
+    </div>
+
+    <div class="faq">
+      <div class="q">
+        <h3>Can I do a longer or shorter dark retreat?</h3>
+        <p>No. The dark retreat portion of this study is a fixed 4 nights / 3 full days for every participant. This consistency is essential to the study's validity.</p>
+      </div>
+      <div class="q">
+        <h3>Can I withdraw or get a refund if my plans change?</h3>
+        <p>Participation in the research itself is voluntary and you may stop contributing data at any time &mdash; that's your right as a study participant. However, <strong>your booking is non-refundable once you commit.</strong> Spots are extremely limited, and a cancellation prevents another person from taking part. Please commit only after carefully considering your schedule, capacity, and finances.</p>
+      </div>
+      <div class="q">
+        <h3>Can I leave the dark room early?</h3>
+        <p>Yes, you can leave the room at any time, for any reason, without penalty.</p>
+      </div>
+      <div class="q">
+        <h3>I have dietary restrictions. Can you accommodate them?</h3>
+        <p>Yes &mdash; the kitchen at Holos can accommodate virtually any dietary requirements. You'll have an opportunity at booking to share your needs, and we'll confirm with the Holos team.</p>
+      </div>
+      <div class="q">
+        <h3>Can I use my own facilitator? Who will be facilitating?</h3>
+        <p>No, not for this study. Due to study design requirements, we need a consistent facilitation approach across all participants.</p>
+      </div>
+      <div class="q">
+        <h3>Will there be bloodwork?</h3>
+        <p>Yes &mdash; the study uses both saliva and blood samples. Blood draws are performed by a qualified phlebotomist at several points before and after your time in the dark room (not while you are inside).</p>
+      </div>
+      <div class="q">
+        <h3>What about devices or wearables during the retreat?</h3>
+        <p>You wear nothing. The room uses non-contact sensors &mdash; radar for presence, breathing, and heart rate; a thermal camera that senses heat rather than visible light; and a microphone / speaker system. The room stays completely dark.</p>
+      </div>
+    </div>
+
+    <!-- COLOPHON ─────────────────────────────────────────────────────── -->
+    <div class="colophon">
+      <div class="block">
+        <span class="lbl">Study</span>
+        Acraya × IACS Dark-Room Retreat Study<br>
+        Holos &middot; Diamante Valley &middot; Costa Rica<br>
+        October &ndash; December 2026
+      </div>
+      <div class="block">
+        <span class="lbl">Principal Investigator</span>
+        Dr.&nbsp;Nicco Reggente, IACS<br><br>
+        <span class="lbl">Co-Investigator &amp; Consultant</span>
+        Dr.&nbsp;Matthew Sacchet, Harvard Medical School / MGH
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+</body>
+</html>
