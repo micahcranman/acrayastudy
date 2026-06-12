@@ -33,7 +33,11 @@
     line-height: 1.55;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+    widows: 3;
+    orphans: 3;
+    hyphens: auto;
   }
+  p { hyphens: auto; }
 
   /* ───────────────────────────── typography ───────────────────────────── */
   .eyebrow {
@@ -159,7 +163,7 @@
     break-inside: avoid-page;
   }
   section.doc + section.doc {
-    margin-top: 18pt;
+    margin-top: 14pt;
   }
   .section-head {
     display: flex;
@@ -188,7 +192,7 @@
     display: grid;
     grid-template-columns: 1.4in 1fr;
     gap: 22pt;
-    margin-bottom: 16pt;
+    margin-bottom: 13pt;
     break-inside: avoid;
   }
   .row .left h3 { font-family: var(--display); font-size: 11pt; font-weight: 400; letter-spacing: 0; text-transform: none; margin: 0; line-height: 1.3; }
@@ -196,12 +200,12 @@
   .row .right p:last-child, .row .right ul:last-child { margin-bottom: 0; }
 
   /* timeline */
-  .timeline { margin: 4pt 0 6pt; }
+  .timeline { margin: 4pt 0 6pt; break-inside: avoid; }
   .timeline .day {
     display: grid;
     grid-template-columns: 1in 1fr;
     gap: 22pt;
-    padding: 9pt 0;
+    padding: 7pt 0;
     border-top: 0.5pt solid var(--rule);
     break-inside: avoid;
   }
@@ -290,7 +294,7 @@
   }
   ol.attest li {
     counter-increment: attest;
-    padding: 11pt 0 11pt 0.45in;
+    padding: 10pt 0 10pt 0.45in;
     border-top: 0.5pt solid var(--rule);
     position: relative;
     font-size: 10.5pt;
@@ -333,20 +337,20 @@
   /* FAQ */
   .faq .q {
     break-inside: avoid;
-    padding: 11pt 0;
+    padding: 7pt 0;
     border-top: 0.5pt solid var(--rule);
   }
   .faq .q:last-child { border-bottom: 0.5pt solid var(--rule); }
   .faq .q h3 {
     font-family: var(--display);
-    font-size: 10.5pt;
+    font-size: 10pt;
     font-weight: 500;
     letter-spacing: 0;
     text-transform: none;
-    margin: 0 0 5pt;
+    margin: 0 0 4pt;
     color: var(--ink);
   }
-  .faq .q p { font-size: 10.5pt; margin: 0; color: var(--ink-soft); }
+  .faq .q p { font-size: 10pt; line-height: 1.5; margin: 0; color: var(--ink-soft); }
 
   /* photograph */
   figure.photo {
@@ -368,26 +372,29 @@
 
   /* running footer via @page would need paged.js; instead, a closing colophon page */
   .colophon {
-    margin-top: 28pt;
-    padding-top: 14pt;
+    margin-top: 16pt;
+    padding-top: 10pt;
     border-top: 0.5pt solid var(--rule);
+    break-before: avoid-page;
+    break-inside: avoid;
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 28pt;
-    font-size: 9pt;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 24pt;
+    font-size: 8.5pt;
     color: var(--ink-mute);
-    line-height: 1.55;
+    line-height: 1.5;
   }
   .colophon .block .lbl {
     font-family: var(--display);
-    font-size: 7.5pt;
-    letter-spacing: 0.30em;
+    font-size: 7pt;
+    letter-spacing: 0.28em;
     text-transform: uppercase;
     color: var(--ink);
     font-weight: 500;
     display: block;
-    margin-bottom: 4pt;
+    margin-bottom: 3pt;
   }
+  .colophon .block + .lbl-spacer { margin-top: 8pt; }
 
   /* avoid orphan headings */
   h2, h3 { break-after: avoid-page; }
@@ -454,7 +461,7 @@
 
     <div class="hairline"></div>
 
-    <p style="font-size: 11pt;">If you choose to take part, you will be one of roughly <strong>forty participants</strong>.</p>
+    <p style="font-size: 11pt;">If you choose to take part, you will be one of roughly forty participants.</p>
   </section>
 
   <!-- THE DETAILS ────────────────────────────────────────────────────── -->
@@ -703,7 +710,6 @@
       </div>
     </div>
 
-    <!-- COLOPHON ─────────────────────────────────────────────────────── -->
     <div class="colophon">
       <div class="block">
         <span class="lbl">Study</span>
@@ -713,9 +719,10 @@
       </div>
       <div class="block">
         <span class="lbl">Principal Investigator</span>
-        Dr.&nbsp;Nicco Reggente, IACS<br><br>
+        Dr.&nbsp;Nicco Reggente &middot; IACS
+        <div style="height: 6pt;"></div>
         <span class="lbl">Co-Investigator &amp; Consultant</span>
-        Dr.&nbsp;Matthew Sacchet, Harvard Medical School / MGH
+        Dr.&nbsp;Matthew Sacchet &middot; Harvard Medical School &amp; Massachusetts General Hospital
       </div>
     </div>
 
